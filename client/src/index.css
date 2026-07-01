@@ -1,33 +1,35 @@
 /**
  * =============================================================================
- * GLOBAL STYLES — ARCHIVE TERMINAL v2.0
+ * GLOBAL STYLES — ARCHIVE TERMINAL v3.0
+ * "Sci-Fi Server Room Terminal" Aesthetic
  * =============================================================================
  */
 
 @import "tailwindcss";
 
 @theme {
-  /* Dark backgrounds */
-  --color-dark-bg: #080810;
-  --color-dark-card: #0e0e1a;
-  --color-dark-surface: #141428;
-  --color-dark-border: #1e1e3a;
+  /* Dark backgrounds — even darker for the server room */
+  --color-dark-bg: #060610;
+  --color-dark-card: #0c0c18;
+  --color-dark-surface: #12122a;
+  --color-dark-border: #1a1a38;
 
-  /* Neon palette — expanded with pink and orange */
+  /* Neon palette — cyan / magenta / green (matching reference) */
   --color-neon-cyan: #00f0ff;
-  --color-neon-cyan-dim: #00a0aa;
+  --color-neon-cyan-dim: #0099aa;
+  --color-neon-magenta: #ff00cc;
+  --color-neon-magenta-dim: #aa0088;
   --color-neon-purple: #a855f7;
   --color-neon-purple-deep: #7c3aed;
-  --color-neon-pink: #ff00cc;
   --color-neon-green: #00ff88;
   --color-neon-amber: #ffaa00;
   --color-neon-red: #ff3366;
   --color-neon-orange: #ff6b00;
 
   /* Text hierarchy */
-  --color-text-primary: #e2e2f2;
-  --color-text-secondary: #8888aa;
-  --color-text-muted: #44445a;
+  --color-text-primary: #d8d8f0;
+  --color-text-secondary: #7a7a9e;
+  --color-text-muted: #3e3e5a;
 
   /* Font stacks */
   --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
@@ -46,22 +48,22 @@ body {
 
 #root {
   min-height: 100vh;
+  position: relative;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
-/* Custom text selection */
 ::selection {
   background-color: rgba(0, 240, 255, 0.2);
   color: var(--color-neon-cyan);
 }
 
-/* Neon scrollbar for entire page */
+/* Neon scrollbar */
 ::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--color-dark-bg); }
+::-webkit-scrollbar-track { background: #060610; }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #00f0ff, #a855f7);
+  background: linear-gradient(180deg, #00f0ff, #ff00cc);
   border-radius: 10px;
 }

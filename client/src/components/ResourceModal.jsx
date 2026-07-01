@@ -1,9 +1,9 @@
 /**
  * =============================================================================
- * RESOURCE MODAL — ARCHIVE TERMINAL v2.0
+ * RESOURCE MODAL — ARCHIVE TERMINAL v3.0
  * =============================================================================
- * Create / Edit form modal with animated gradient border header,
- * neon-styled form controls, and "Other" category option.
+ * Metal-framed Create/Edit form with screw heads, gradient accent bar,
+ * and a cyan neural network schematic SVG inside the modal body.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -18,11 +18,92 @@ const EMPTY_FORM = {
 const CATEGORIES = ['AI Model', 'Code Snippet', 'Research Paper', 'Tool', 'Other'];
 const STATUSES   = ['Active', 'Archived', 'In Review'];
 
+/* ── Neural Network SVG ──────────────────────────────────────────────────── */
+const NeuralNetSVG = () => (
+  <svg
+    viewBox="0 0 400 80"
+    className="w-full h-full"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Connections — layer 1 to layer 2 */}
+    <line x1="60" y1="20" x2="140" y2="15" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
+    <line x1="60" y1="20" x2="140" y2="40" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
+    <line x1="60" y1="20" x2="140" y2="65" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
+    <line x1="60" y1="40" x2="140" y2="15" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
+    <line x1="60" y1="40" x2="140" y2="40" stroke="#00f0ff" strokeWidth="0.5" opacity="0.5" />
+    <line x1="60" y1="40" x2="140" y2="65" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
+    <line x1="60" y1="60" x2="140" y2="15" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
+    <line x1="60" y1="60" x2="140" y2="40" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
+    <line x1="60" y1="60" x2="140" y2="65" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
+
+    {/* Connections — layer 2 to layer 3 */}
+    <line x1="140" y1="15" x2="220" y2="20" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
+    <line x1="140" y1="15" x2="220" y2="45" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
+    <line x1="140" y1="15" x2="220" y2="65" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
+    <line x1="140" y1="40" x2="220" y2="20" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
+    <line x1="140" y1="40" x2="220" y2="45" stroke="#00f0ff" strokeWidth="0.5" opacity="0.5" />
+    <line x1="140" y1="40" x2="220" y2="65" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
+    <line x1="140" y1="65" x2="220" y2="20" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
+    <line x1="140" y1="65" x2="220" y2="45" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
+    <line x1="140" y1="65" x2="220" y2="65" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
+
+    {/* Connections — layer 3 to layer 4 */}
+    <line x1="220" y1="20" x2="300" y2="25" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
+    <line x1="220" y1="20" x2="300" y2="55" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
+    <line x1="220" y1="45" x2="300" y2="25" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
+    <line x1="220" y1="45" x2="300" y2="55" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
+    <line x1="220" y1="65" x2="300" y2="25" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
+    <line x1="220" y1="65" x2="300" y2="55" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
+
+    {/* Connections — layer 4 to output */}
+    <line x1="300" y1="25" x2="360" y2="40" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
+    <line x1="300" y1="55" x2="360" y2="40" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
+
+    {/* Layer 1 nodes (input) */}
+    <circle cx="60" cy="20" r="4" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.7" />
+    <circle cx="60" cy="40" r="4" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.7" />
+    <circle cx="60" cy="60" r="4" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.7" />
+
+    {/* Layer 2 nodes (hidden 1) */}
+    <circle cx="140" cy="15" r="4.5" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.8">
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="140" cy="40" r="4.5" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.8">
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="2.5s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="140" cy="65" r="4.5" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.8">
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="1.8s" repeatCount="indefinite" />
+    </circle>
+
+    {/* Layer 3 nodes (hidden 2) */}
+    <circle cx="220" cy="20" r="4.5" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.8">
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="2.2s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="220" cy="45" r="5" fill="#060610" stroke="#00f0ff" strokeWidth="1.2" opacity="0.9">
+      <animate attributeName="opacity" values="0.9;1;0.9" dur="1.5s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="220" cy="65" r="4.5" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.8">
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="2.8s" repeatCount="indefinite" />
+    </circle>
+
+    {/* Layer 4 nodes */}
+    <circle cx="300" cy="25" r="4" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.7" />
+    <circle cx="300" cy="55" r="4" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.7" />
+
+    {/* Output node */}
+    <circle cx="360" cy="40" r="5" fill="rgba(0,240,255,0.15)" stroke="#00f0ff" strokeWidth="1.5" opacity="0.9">
+      <animate attributeName="r" values="5;6;5" dur="2s" repeatCount="indefinite" />
+    </circle>
+  </svg>
+);
+
+/* ══════════════════════════════════════════════════════════════════════════════ */
+
 const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
   const [formData, setFormData] = useState(EMPTY_FORM);
   const isEditing = !!resource;
 
-  /* Populate form when editing */
   useEffect(() => {
     if (resource) {
       setFormData({
@@ -57,55 +138,59 @@ const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
       aria-modal="true"
       aria-labelledby="modal-title"
     >
-      {/* Modal panel */}
+      {/* Metal-framed modal panel */}
       <div
-        className="glass-strong w-full max-w-lg mx-4 overflow-hidden animate-slide-up"
+        className="metal-frame w-full max-w-lg mx-4 animate-slide-up"
         onClick={e => e.stopPropagation()}
       >
-        {/* Gradient accent bar at top */}
-        <div
-          className="h-[3px] w-full"
-          style={{ background: 'linear-gradient(90deg, #00f0ff, #a855f7, #ff00cc)' }}
-        />
+        {/* Corner screws */}
+        <div className="screw screw-tl" />
+        <div className="screw screw-tr" />
+        <div className="screw screw-bl" />
+        <div className="screw screw-br" />
 
-        <div className="p-6">
+        {/* Gradient accent bar */}
+        <div className="metal-accent-bar" />
+
+        {/* Inner dark content area */}
+        <div className="metal-inner m-3 p-5">
+
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-start justify-between mb-5">
             <div>
-              <h2 id="modal-title" className="font-mono text-lg font-bold tracking-wider">
-                <span className="gradient-text">
+              <h2 id="modal-title" className="font-mono text-base font-bold tracking-wider">
+                <span className="neon-text-magenta">
                   {isEditing ? '// EDIT_RESOURCE' : '// NEW_RESOURCE'}
                 </span>
               </h2>
-              <p className="font-mono text-[0.65rem] text-text-muted mt-1">
+              <p className="font-mono text-[0.62rem] text-text-muted mt-1">
                 {isEditing
                   ? 'Modify the fields below and execute to save changes.'
                   : 'Fill in the fields below to add to the archive.'}
               </p>
             </div>
 
-            {/* Close button */}
             <button
               onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200"
-              style={{ color: '#44445a', border: '1px solid rgba(30,30,58,0.8)' }}
-              onMouseEnter={e => { e.currentTarget.style.color='#ff3366'; e.currentTarget.style.borderColor='rgba(255,51,102,0.4)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color='#44445a'; e.currentTarget.style.borderColor='rgba(30,30,58,0.8)'; }}
+              className="w-7 h-7 flex items-center justify-center rounded-md transition-all duration-200"
+              style={{ color: '#3e3e5a', border: '1px solid rgba(26,26,56,0.8)' }}
+              onMouseEnter={e => { e.currentTarget.style.color='#ff3366'; e.currentTarget.style.borderColor='rgba(255,51,102,0.3)'; }}
+              onMouseLeave={e => { e.currentTarget.style.color='#3e3e5a'; e.currentTarget.style.borderColor='rgba(26,26,56,0.8)'; }}
               aria-label="Close modal"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
 
             {/* Title */}
             <div>
-              <label className="block font-mono text-[0.68rem] text-text-secondary mb-2 tracking-widest uppercase">
-                <span className="text-neon-cyan mr-1">►</span> Title
+              <label className="block font-mono text-[0.65rem] text-text-secondary mb-1.5 tracking-widest uppercase">
+                <span className="text-neon-magenta mr-1">▸</span> TITLE
               </label>
               <input
                 type="text"
@@ -113,27 +198,39 @@ const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
                 value={formData.title}
                 onChange={handleChange}
                 placeholder="e.g. GPT-4 Vision, React hooks..."
-                className="input-neon"
+                className="input-neon input-magenta"
                 required
                 autoFocus
               />
             </div>
 
-            {/* Category + Status — side by side */}
+            {/* Category + Status side by side */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block font-mono text-[0.68rem] text-text-secondary mb-2 tracking-widest uppercase">
-                  <span className="text-neon-purple mr-1">►</span> Category
+                <label className="block font-mono text-[0.65rem] text-text-secondary mb-1.5 tracking-widest uppercase">
+                  <span className="text-neon-cyan mr-1">▸</span> CATEGORY
                 </label>
-                <select name="category" value={formData.category} onChange={handleChange} className="input-neon cursor-pointer">
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="input-neon cursor-pointer"
+                  style={{ borderColor: 'rgba(0, 240, 255, 0.3)' }}
+                >
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block font-mono text-[0.68rem] text-text-secondary mb-2 tracking-widest uppercase">
-                  <span className="text-neon-green mr-1">►</span> Status
+                <label className="block font-mono text-[0.65rem] text-text-secondary mb-1.5 tracking-widest uppercase">
+                  <span className="text-neon-cyan mr-1">▸</span> STATUS
                 </label>
-                <select name="status" value={formData.status} onChange={handleChange} className="input-neon cursor-pointer">
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  className="input-neon cursor-pointer"
+                  style={{ borderColor: 'rgba(0, 240, 255, 0.3)' }}
+                >
                   {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
@@ -141,37 +238,35 @@ const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
 
             {/* Description */}
             <div>
-              <label className="block font-mono text-[0.68rem] text-text-secondary mb-2 tracking-widest uppercase">
-                <span className="text-neon-amber mr-1">►</span> Description
+              <label className="block font-mono text-[0.65rem] text-text-secondary mb-1.5 tracking-widest uppercase">
+                <span className="text-neon-amber mr-1">▸</span> DESCRIPTION
               </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                placeholder="Describe this resource — what it does, why it's useful..."
-                rows={4}
-                className="input-neon resize-none scrollbar-neon"
+                placeholder="what it does, why it's useful..."
+                rows={3}
+                className="input-neon input-magenta resize-none scrollbar-neon"
               />
+            </div>
+
+            {/* Neural network schematic */}
+            <div className="neural-net-container">
+              <NeuralNetSVG />
             </div>
 
             {/* Buttons */}
             <div
-              className="flex items-center justify-end gap-3 pt-4"
-              style={{ borderTop: '1px solid rgba(30,30,58,0.8)' }}
+              className="flex items-center justify-end gap-3 pt-3"
+              style={{ borderTop: '1px solid rgba(26,26,56,0.7)' }}
             >
-              <button
-                type="button"
-                onClick={onClose}
-                className="btn-neon !text-text-secondary !border-dark-border !bg-transparent hover:!text-text-primary"
-                style={{ border: '1px solid rgba(30,30,58,0.8)' }}
-              >
+              <button type="button" onClick={onClose} className="btn-neon btn-magenta">
                 ABORT
               </button>
-
               <button type="submit" className="btn-neon btn-cyan">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                 </svg>
                 EXECUTE
               </button>

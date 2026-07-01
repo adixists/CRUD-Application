@@ -1,15 +1,10 @@
 /**
  * =============================================================================
- * RESOURCE CARD — ARCHIVE TERMINAL v2.0
+ * RESOURCE CARD — ARCHIVE TERMINAL v3.0
  * =============================================================================
- * Holographic glassmorphism card with:
- * ● Category-specific left accent border (each category = unique neon color)
- * ● Holographic shimmer sweep on hover
- * ● "NEW" badge for resources created in the last 24 hours
- * ● Color-coded category badge + status pill in header
- * ● Title that glows on hover
- * ● 3-line clamped description
- * ● Footer with formatted date + edit/delete action buttons
+ * Holographic glassmorphism card with category-specific left accent border,
+ * holographic shimmer sweep on hover, "NEW" badge, color-coded badges,
+ * and title that glows on hover. Adapted for the cyan/magenta/green palette.
  */
 
 import React from 'react';
@@ -17,39 +12,39 @@ import React from 'react';
 /* ── Category → visual style mapping ─────────────────────────────────────── */
 const CATEGORY_CONFIG = {
   'AI Model': {
-    bg:      'rgba(0, 240, 255, 0.08)',
-    color:   '#00f0ff',
-    border:  'rgba(0, 240, 255, 0.25)',
-    accent:  'accent-cyan',
-    dot:     '#00f0ff',
+    bg:     'rgba(0, 240, 255, 0.07)',
+    color:  '#00f0ff',
+    border: 'rgba(0, 240, 255, 0.22)',
+    accent: 'accent-cyan',
+    dot:    '#00f0ff',
   },
   'Code Snippet': {
-    bg:      'rgba(168, 85, 247, 0.08)',
-    color:   '#a855f7',
-    border:  'rgba(168, 85, 247, 0.25)',
-    accent:  'accent-purple',
-    dot:     '#a855f7',
+    bg:     'rgba(168, 85, 247, 0.07)',
+    color:  '#a855f7',
+    border: 'rgba(168, 85, 247, 0.22)',
+    accent: 'accent-purple',
+    dot:    '#a855f7',
   },
   'Research Paper': {
-    bg:      'rgba(255, 170, 0, 0.08)',
-    color:   '#ffaa00',
-    border:  'rgba(255, 170, 0, 0.25)',
-    accent:  'accent-amber',
-    dot:     '#ffaa00',
+    bg:     'rgba(255, 170, 0, 0.07)',
+    color:  '#ffaa00',
+    border: 'rgba(255, 170, 0, 0.22)',
+    accent: 'accent-amber',
+    dot:    '#ffaa00',
   },
   'Tool': {
-    bg:      'rgba(0, 255, 136, 0.08)',
-    color:   '#00ff88',
-    border:  'rgba(0, 255, 136, 0.25)',
-    accent:  'accent-green',
-    dot:     '#00ff88',
+    bg:     'rgba(0, 255, 136, 0.07)',
+    color:  '#00ff88',
+    border: 'rgba(0, 255, 136, 0.22)',
+    accent: 'accent-green',
+    dot:    '#00ff88',
   },
   'Other': {
-    bg:      'rgba(255, 0, 204, 0.08)',
-    color:   '#ff00cc',
-    border:  'rgba(255, 0, 204, 0.25)',
-    accent:  'accent-pink',
-    dot:     '#ff00cc',
+    bg:     'rgba(255, 0, 204, 0.07)',
+    color:  '#ff00cc',
+    border: 'rgba(255, 0, 204, 0.22)',
+    accent: 'accent-pink',
+    dot:    '#ff00cc',
   },
 };
 
@@ -60,44 +55,36 @@ const STATUS_CLASS = {
   'In Review': 'status-review',
 };
 
-/* ── Date formatter ───────────────────────────────────────────────────────── */
 const formatDate = (dateString) =>
   new Date(dateString).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
   });
 
-/* ── "Is New" — within 24 hours ───────────────────────────────────────────── */
 const isNew = (dateString) =>
   Date.now() - new Date(dateString).getTime() < 86_400_000;
 
 /* ══════════════════════════════════════════════════════════════════════════════ */
 
 const ResourceCard = ({ resource, onEdit, onDelete }) => {
-  const cat    = CATEGORY_CONFIG[resource.category] || CATEGORY_CONFIG['Other'];
-  const stCls  = STATUS_CLASS[resource.status]      || 'status-active';
-  const fresh  = isNew(resource.createdAt);
+  const cat   = CATEGORY_CONFIG[resource.category] || CATEGORY_CONFIG['Other'];
+  const stCls = STATUS_CLASS[resource.status]      || 'status-active';
+  const fresh = isNew(resource.createdAt);
 
   return (
     <div
       className={`glass card-holo flex flex-col h-full p-5 group ${cat.accent}`}
-      style={{ minHeight: '220px' }}
+      style={{ minHeight: '210px' }}
     >
-      {/* ── Header: category badge + status + NEW badge ─────────────────── */}
-      <div className="flex items-start justify-between mb-4 gap-2 flex-wrap">
-
-        {/* Category badge */}
+      {/* Header: category + status + NEW badge */}
+      <div className="flex items-start justify-between mb-3 gap-2 flex-wrap">
         <span
           className="category-badge"
           style={{ background: cat.bg, color: cat.color, border: `1px solid ${cat.border}` }}
         >
-          <span
-            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-            style={{ background: cat.dot }}
-          />
+          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: cat.dot }} />
           {resource.category}
         </span>
 
-        {/* Right side: NEW badge (if fresh) + status pill */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {fresh && <span className="badge-new">✦ NEW</span>}
           <span className={stCls}>
@@ -106,7 +93,7 @@ const ResourceCard = ({ resource, onEdit, onDelete }) => {
               style={{
                 background:
                   resource.status === 'Active'    ? '#00ff88' :
-                  resource.status === 'In Review' ? '#ffaa00' : '#8888aa',
+                  resource.status === 'In Review' ? '#ffaa00' : '#7a7a9e',
                 boxShadow:
                   resource.status === 'Active'
                     ? '0 0 6px rgba(0,255,136,0.7)'
@@ -120,36 +107,34 @@ const ResourceCard = ({ resource, onEdit, onDelete }) => {
         </div>
       </div>
 
-      {/* ── Title ──────────────────────────────────────────────────────────── */}
+      {/* Title */}
       <h3
-        className="font-mono text-base font-bold mb-2 leading-snug transition-all duration-300"
-        style={{ color: '#e2e2f2' }}
+        className="font-mono text-[0.95rem] font-bold mb-2 leading-snug transition-all duration-300"
+        style={{ color: '#d8d8f0' }}
         onMouseEnter={e => { e.currentTarget.style.color = cat.color; e.currentTarget.style.textShadow = `0 0 12px ${cat.dot}60`; }}
-        onMouseLeave={e => { e.currentTarget.style.color = '#e2e2f2'; e.currentTarget.style.textShadow = 'none'; }}
+        onMouseLeave={e => { e.currentTarget.style.color = '#d8d8f0'; e.currentTarget.style.textShadow = 'none'; }}
       >
         {resource.title}
       </h3>
 
-      {/* ── Description ────────────────────────────────────────────────────── */}
+      {/* Description */}
       <p className="text-sm text-text-secondary leading-relaxed mb-4 flex-grow line-clamp-3">
         {resource.description || 'No description provided.'}
       </p>
 
-      {/* ── Footer: date + actions ─────────────────────────────────────────── */}
+      {/* Footer: date + actions */}
       <div
-        className="flex items-center justify-between mt-auto pt-4"
-        style={{ borderTop: '1px solid rgba(30,30,58,0.8)' }}
+        className="flex items-center justify-between mt-auto pt-3"
+        style={{ borderTop: '1px solid rgba(26,26,56,0.7)' }}
       >
-        {/* Creation date */}
-        <span className="font-mono text-[0.65rem] text-text-muted">
+        <span className="font-mono text-[0.62rem] text-text-muted">
           {formatDate(resource.createdAt)}
         </span>
 
-        {/* Action buttons */}
         <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit(resource)}
-            className="btn-neon btn-cyan !py-1.5 !px-3 !text-[0.65rem]"
+            className="btn-neon btn-cyan !py-1.5 !px-3 !text-[0.62rem]"
             aria-label={`Edit ${resource.title}`}
           >
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,7 +146,7 @@ const ResourceCard = ({ resource, onEdit, onDelete }) => {
 
           <button
             onClick={() => onDelete(resource)}
-            className="btn-neon btn-red !py-1.5 !px-3 !text-[0.65rem]"
+            className="btn-neon btn-red !py-1.5 !px-3 !text-[0.62rem]"
             aria-label={`Delete ${resource.title}`}
           >
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

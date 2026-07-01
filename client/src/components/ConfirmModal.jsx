@@ -1,8 +1,8 @@
 /**
  * =============================================================================
- * CONFIRM MODAL — ARCHIVE TERMINAL v2.0
+ * CONFIRM MODAL — ARCHIVE TERMINAL v3.0
  * =============================================================================
- * Stylized danger confirmation with animated warning icon.
+ * Metal-framed danger confirmation dialog with screw heads.
  */
 
 import React from 'react';
@@ -16,32 +16,26 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, resourceTitle }) => {
   };
 
   return (
-    <div
-      className="modal-overlay"
-      onClick={onClose}
-      role="alertdialog"
-      aria-modal="true"
-      aria-labelledby="confirm-title"
-    >
+    <div className="modal-overlay" onClick={onClose} role="alertdialog" aria-modal="true">
       <div
-        className="glass-strong w-full max-w-sm mx-4 overflow-hidden animate-slide-up"
+        className="metal-frame w-full max-w-sm mx-4 animate-slide-up"
         onClick={e => e.stopPropagation()}
       >
-        {/* Red danger bar at top */}
-        <div
-          className="h-[3px]"
-          style={{ background: 'linear-gradient(90deg, #ff3366, #ff00cc, #ffaa00)' }}
-        />
+        {/* Screws */}
+        <div className="screw screw-tl" />
+        <div className="screw screw-tr" />
+        <div className="screw screw-bl" />
+        <div className="screw screw-br" />
 
-        <div className="p-6 text-center">
-          {/* Animated warning icon */}
+        {/* Accent bar */}
+        <div className="metal-accent-bar" style={{ background: 'linear-gradient(90deg, #ff3366, #ff00cc, #ffaa00)' }} />
+
+        <div className="metal-inner m-3 p-6 text-center">
+          {/* Warning icon */}
           <div className="flex justify-center mb-5">
             <div
               className="w-16 h-16 rounded-full flex items-center justify-center animate-pulse-glow"
-              style={{
-                background: 'rgba(255, 51, 102, 0.08)',
-                border: '1px solid rgba(255, 51, 102, 0.3)',
-              }}
+              style={{ background: 'rgba(255, 51, 102, 0.06)', border: '1px solid rgba(255, 51, 102, 0.25)' }}
             >
               <svg className="w-8 h-8" style={{ color: '#ff3366' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
@@ -50,36 +44,15 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, resourceTitle }) => {
             </div>
           </div>
 
-          {/* Title */}
-          <h2 id="confirm-title" className="font-mono text-base font-bold text-text-primary mb-2 tracking-wider">
-            CONFIRM DELETION
-          </h2>
+          <h2 className="font-mono text-sm font-bold text-text-primary mb-2 tracking-wider">CONFIRM DELETION</h2>
+          <p className="text-sm text-text-secondary mb-1">You are about to permanently remove:</p>
+          <p className="font-mono text-sm font-bold mb-4 px-2" style={{ color: '#ff3366' }}>"{resourceTitle}"</p>
+          <p className="font-mono text-[0.6rem] text-text-muted mb-5">{'// This action cannot be undone.'}</p>
 
-          {/* Resource name */}
-          <p className="text-sm text-text-secondary mb-1">
-            You are about to permanently remove:
-          </p>
-          <p className="font-mono text-sm font-bold mb-4 px-2" style={{ color: '#ff3366' }}>
-            "{resourceTitle}"
-          </p>
-
-          {/* Warning line */}
-          <p className="font-mono text-[0.65rem] text-text-muted mb-6">
-            {'// This action cannot be undone.'}
-          </p>
-
-          {/* Buttons */}
           <div className="flex items-center justify-center gap-3">
-            <button
-              onClick={onClose}
-              className="btn-neon !text-text-secondary !bg-transparent"
-              style={{ border: '1px solid rgba(30,30,58,0.8)' }}
-            >
-              CANCEL
-            </button>
-
+            <button onClick={onClose} className="btn-neon btn-magenta">CANCEL</button>
             <button onClick={handleConfirm} className="btn-neon btn-red">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
