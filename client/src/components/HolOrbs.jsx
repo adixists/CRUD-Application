@@ -1,159 +1,197 @@
 /**
  * =============================================================================
- * SPACE HUD — Archive Terminal v4.0
+ * SERVER ROOM HUD — Archive Terminal v4.0
  * =============================================================================
- * AI-generated rocket image with CSS fly-in animation.
- * - Rocket flies from left to center on page load
- * - Live flickering exhaust fire image behind the rocket
- * - Three stat windows overlaid on the rocket body
- * - Deep space AI background
- * - CSS particle sparks from exhaust
+ * A cyberpunk server room dashboard with:
+ * - Animated data-stream columns (vertical flowing bits)
+ * - Three glowing server monitor panels showing TOTAL / ACTIVE / ARCHIVED
+ * - Blinking rack LEDs across the background
+ * - Horizontal scan-line sweep
+ * - Pulsing power indicators
+ * - All pure CSS + minimal JS — no Three.js, no images
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 /* ═══════════════════════════════════════════════════════════════════════════ */
-/*  EXHAUST SPARK PARTICLES (pure CSS + JS canvas)                              */
+/*  DATA STREAM COLUMNS — vertical falling "bits"                               */
 /* ═══════════════════════════════════════════════════════════════════════════ */
-function ExhaustCanvas({ parentRef }) {
-  const canvasRef = useRef(null);
-  const particlesRef = useRef([]);
-  const rafRef = useRef(null);
-
-  const createParticle = useCallback((w, h, exhaustX, exhaustY) => {
-    return {
-      x: exhaustX + Math.random() * 10,
-      y: exhaustY + (Math.random() - 0.5) * 30,
-      vx: -(1 + Math.random() * 4),
-      vy: (Math.random() - 0.5) * 1.5,
-      life: 0.6 + Math.random() * 0.5,
-      maxLife: 0.6 + Math.random() * 0.5,
-      size: 1 + Math.random() * 3,
-    };
+function DataStreams() {
+  const streams = useMemo(() => {
+    const arr = [];
+    for (let i = 0; i < 28; i++) {
+      arr.push({
+        left: `${(i / 28) * 100 + Math.random() * 2}%`,
+        duration: 2 + Math.random() * 4,
+        delay: Math.random() * 3,
+        opacity: 0.04 + Math.random() * 0.08,
+        char: ['0', '1', '█', '▓', '░', '│', '┃'][Math.floor(Math.random() * 7)],
+      });
+    }
+    return arr;
   }, []);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const parent = parentRef.current;
-    if (!canvas || !parent) return;
-
-    const ctx = canvas.getContext('2d');
-    let running = true;
-    let lastTime = performance.now();
-
-    const resize = () => {
-      const rect = parent.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    const loop = (now) => {
-      if (!running) return;
-      const dt = Math.min((now - lastTime) / 1000, 0.05);
-      lastTime = now;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Exhaust origin — roughly where the rocket nozzle is
-      // Rocket center is at 50%, exhaust is at its left tail (~20% from left when settled)
-      const exhaustX = canvas.width * 0.28;
-      const exhaustY = canvas.height * 0.5;
-
-      // Spawn new particles
-      for (let i = 0; i < 3; i++) {
-        if (particlesRef.current.length < 150) {
-          particlesRef.current.push(createParticle(canvas.width, canvas.height, exhaustX, exhaustY));
-        }
-      }
-
-      // Update & draw
-      particlesRef.current = particlesRef.current.filter(p => {
-        p.life -= dt;
-        if (p.life <= 0) return false;
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += (Math.random() - 0.5) * 0.3;
-
-        const age = 1 - (p.life / p.maxLife);
-        let r, g, b, a;
-        if (age < 0.15) {
-          r = 255; g = 255; b = 220; a = 0.9;
-        } else if (age < 0.4) {
-          r = 255; g = 180 - age * 200; b = 50; a = 0.8;
-        } else if (age < 0.7) {
-          r = 255; g = 80; b = 0; a = 0.6 - age * 0.3;
-        } else {
-          r = 180; g = 30; b = 0; a = 0.3 * (1 - age);
-        }
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * (1 - age * 0.5), 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
-        ctx.fill();
-
-        // Glow
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * 2.5 * (1 - age * 0.5), 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${r},${g},${b},${a * 0.15})`;
-        ctx.fill();
-
-        return true;
-      });
-
-      rafRef.current = requestAnimationFrame(loop);
-    };
-
-    rafRef.current = requestAnimationFrame(loop);
-
-    return () => {
-      running = false;
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      window.removeEventListener('resize', resize);
-    };
-  }, [parentRef, createParticle]);
-
   return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-        zIndex: 3,
-      }}
-    />
+    <div className="srv-data-streams">
+      {streams.map((s, i) => (
+        <div
+          key={i}
+          className="srv-stream-col"
+          style={{
+            left: s.left,
+            animationDuration: `${s.duration}s`,
+            animationDelay: `${s.delay}s`,
+            opacity: s.opacity,
+          }}
+        >
+          {Array.from({ length: 12 }, (_, j) => (
+            <span key={j} style={{ animationDelay: `${j * 0.15}s` }}>
+              {['0', '1', '█', '▓', '░'][Math.floor(Math.random() * 5)]}
+            </span>
+          ))}
+        </div>
+      ))}
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════ */
-/*  STAT WINDOW — glass porthole with number                                    */
+/*  RACK LEDs — rows of blinking indicator lights                               */
 /* ═══════════════════════════════════════════════════════════════════════════ */
-function StatWindow({ value, label, color, delay }) {
+function RackLEDs() {
+  const leds = useMemo(() => {
+    const arr = [];
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 40; col++) {
+        arr.push({
+          top: `${18 + row * 28}%`,
+          left: `${col * 2.5 + 0.5}%`,
+          color: ['#00f0ff', '#00ff88', '#ff00cc', '#ffaa00', '#a855f7'][Math.floor(Math.random() * 5)],
+          delay: Math.random() * 5,
+          duration: 0.5 + Math.random() * 3,
+          size: 2 + Math.random() * 2,
+        });
+      }
+    }
+    return arr;
+  }, []);
+
+  return (
+    <div className="srv-rack-leds">
+      {leds.map((led, i) => (
+        <div
+          key={i}
+          className="srv-led"
+          style={{
+            top: led.top,
+            left: led.left,
+            width: `${led.size}px`,
+            height: `${led.size}px`,
+            backgroundColor: led.color,
+            boxShadow: `0 0 ${led.size * 2}px ${led.color}`,
+            animationDuration: `${led.duration}s`,
+            animationDelay: `${led.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/*  SERVER MONITOR — a single stat display panel                                */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+function ServerMonitor({ value, label, color, delay }) {
   const [visible, setVisible] = useState(false);
+  const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), delay);
     return () => clearTimeout(t);
   }, [delay]);
 
+  // Count-up animation
+  useEffect(() => {
+    if (!visible) return;
+    const target = value;
+    if (target === 0) { setDisplayValue(0); return; }
+    let current = 0;
+    const step = Math.max(1, Math.ceil(target / 20));
+    const iv = setInterval(() => {
+      current += step;
+      if (current >= target) { current = target; clearInterval(iv); }
+      setDisplayValue(current);
+    }, 50);
+    return () => clearInterval(iv);
+  }, [visible, value]);
+
   return (
     <div
-      className="rocket-stat-window"
+      className="srv-monitor"
       style={{
-        '--stat-color': color,
+        '--srv-color': color,
         opacity: visible ? 1 : 0,
-        transform: visible ? 'scale(1)' : 'scale(0.7)',
+        transform: visible ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.92)',
       }}
     >
-      <div className="rsw-ring" />
-      <div className="rsw-inner">
-        <div className="rsw-value">{String(value).padStart(2, '0')}</div>
-        <div className="rsw-label">{label}</div>
+      {/* Screen bezel */}
+      <div className="srv-bezel">
+        {/* CRT scanlines */}
+        <div className="srv-scanlines" />
+
+        {/* Power LED */}
+        <div className="srv-power-led" style={{ backgroundColor: color, boxShadow: `0 0 6px ${color}` }} />
+
+        {/* Screen content */}
+        <div className="srv-screen">
+          {/* Top bar */}
+          <div className="srv-screen-header">
+            <span className="srv-header-dot" style={{ backgroundColor: color }} />
+            <span className="srv-header-text">{label}</span>
+            <span className="srv-header-dot" style={{ backgroundColor: color }} />
+          </div>
+
+          {/* Big number */}
+          <div className="srv-number" style={{ color, textShadow: `0 0 20px ${color}, 0 0 40px ${color}66` }}>
+            {String(displayValue).padStart(2, '0')}
+          </div>
+
+          {/* Bottom bar with activity indicator */}
+          <div className="srv-screen-footer">
+            <div className="srv-activity-bar">
+              {Array.from({ length: 8 }, (_, i) => (
+                <div
+                  key={i}
+                  className="srv-activity-segment"
+                  style={{
+                    backgroundColor: i < Math.min(value + 2, 8) ? color : 'rgba(255,255,255,0.05)',
+                    animationDelay: `${i * 0.12}s`,
+                    opacity: i < Math.min(value + 2, 8) ? undefined : 0.3,
+                  }}
+                />
+              ))}
+            </div>
+            <span className="srv-footer-text" style={{ color: `${color}88` }}>ONLINE</span>
+          </div>
+        </div>
       </div>
+
+      {/* Label below monitor */}
+      <div className="srv-label" style={{ color: `${color}cc` }}>{label}</div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/*  SERVER ROOM WIRES — horizontal connection lines between monitors            */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+function ConnectionWires() {
+  return (
+    <div className="srv-wires">
+      <div className="srv-wire srv-wire-1" />
+      <div className="srv-wire srv-wire-2" />
+      <div className="srv-wire-pulse srv-wire-pulse-1" />
+      <div className="srv-wire-pulse srv-wire-pulse-2" />
     </div>
   );
 }
@@ -162,41 +200,22 @@ function StatWindow({ value, label, color, delay }) {
 /*  MAIN COMPONENT                                                              */
 /* ═══════════════════════════════════════════════════════════════════════════ */
 const HolOrbs = ({ total, active, archived }) => {
-  const containerRef = useRef(null);
-  const [entered, setEntered] = useState(false);
-
-  useEffect(() => {
-    // Trigger fly-in after mount
-    const t = setTimeout(() => setEntered(true), 100);
-    return () => clearTimeout(t);
-  }, []);
-
   return (
-    <div className="space-hud" ref={containerRef}>
-      {/* ── Space background image ── */}
-      <div className="space-hud-bg" />
+    <div className="srv-room">
+      {/* Background layers */}
+      <div className="srv-bg" />
+      <RackLEDs />
+      <DataStreams />
+      <ConnectionWires />
 
-      {/* ── Exhaust fire image (behind rocket) ── */}
-      <div className={`exhaust-fire ${entered ? 'entered' : ''}`}>
-        <img src="/images/exhaust.png" alt="" draggable="false" />
+      {/* Three server monitors */}
+      <div className="srv-monitors">
+        <ServerMonitor value={total}    label="TOTAL"    color="#00f0ff" delay={300}  />
+        <ServerMonitor value={active}   label="ACTIVE"   color="#00ff88" delay={600}  />
+        <ServerMonitor value={archived} label="ARCHIVED" color="#a855f7" delay={900}  />
       </div>
 
-      {/* ── Canvas particle sparks ── */}
-      <ExhaustCanvas parentRef={containerRef} />
-
-      {/* ── Rocket image ── */}
-      <div className={`rocket-ship ${entered ? 'entered' : ''}`}>
-        <img src="/images/rocket.png" alt="Rocket" draggable="false" />
-      </div>
-
-      {/* ── Stat windows overlaid ── */}
-      <div className="space-hud-stats">
-        <StatWindow value={total}    label="TOTAL"    color="#00c8ff" delay={1400} />
-        <StatWindow value={active}   label="ACTIVE"   color="#00e87a" delay={1700} />
-        <StatWindow value={archived} label="ARCHIVED" color="#cc44ff" delay={2000} />
-      </div>
-
-      {/* ── HUD decorations ── */}
+      {/* HUD corner brackets */}
       <div className="hud-corner hud-tl" />
       <div className="hud-corner hud-tr" />
       <div className="hud-corner hud-bl" />
