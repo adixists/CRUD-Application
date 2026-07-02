@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🌌 Archive Terminal v4.0 WebGL Edition
+# 🌌 Archive Terminal
 
 **An immersive, photorealistic 3D CRUD application for managing your digital library**
 
