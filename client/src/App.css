@@ -250,112 +250,147 @@
     0 0 60px rgba(0,240,255,0.06),
     0 0 120px rgba(100,0,200,0.04),
     inset 0 1px 0 rgba(255,255,255,0.03);
-  height: 260px;
+  height: 280px;
+  background: #03030c;
 }
 
-/* The Three.js canvas fills the full background */
-.space-hud-canvas {
+/* ── Deep space background image ── */
+.space-hud-bg {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-}
-.space-hud-canvas canvas {
-  width: 100% !important;
-  height: 100% !important;
+  background: url('/images/space-bg.png') center/cover no-repeat;
+  z-index: 1;
 }
 
-/* ── Porthole stat windows ─────────────────────────────────────────────── */
+/* ── Rocket ship image ── */
+.rocket-ship {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-150%, -50%); /* starts off-screen left */
+  z-index: 4;
+  transition: transform 2.5s cubic-bezier(0.22, 1, 0.36, 1);
+  filter: drop-shadow(0 0 15px rgba(0, 200, 255, 0.3));
+}
+.rocket-ship.entered {
+  transform: translate(-50%, -50%);
+}
+.rocket-ship img {
+  height: 200px;
+  width: auto;
+  display: block;
+  animation: rocketFloat 3s ease-in-out infinite;
+}
+@keyframes rocketFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-8px); }
+}
+
+/* ── Exhaust fire image (sits behind rocket) ── */
+.exhaust-fire {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-200%, -50%);
+  z-index: 2;
+  transition: transform 2.5s cubic-bezier(0.22, 1, 0.36, 1);
+  mix-blend-mode: screen;
+}
+.exhaust-fire.entered {
+  transform: translate(-130%, -50%);
+}
+.exhaust-fire img {
+  height: 120px;
+  width: auto;
+  display: block;
+  animation: exhaustFlicker 0.15s ease-in-out infinite alternate,
+             rocketFloat 3s ease-in-out infinite;
+  filter: brightness(1.3) saturate(1.5);
+}
+@keyframes exhaustFlicker {
+  0%   { opacity: 0.75; transform: scaleX(1)   scaleY(1); }
+  100% { opacity: 1;    transform: scaleX(1.06) scaleY(0.94); }
+}
+
+/* ── Stat windows ── */
 .space-hud-stats {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 20px;
-  padding: 0 40px 0 0;
+  gap: 28px;
+  padding: 0 50px 0 0;
   pointer-events: none;
+  z-index: 6;
 }
 
-.stat-porthole {
-  position: relative;
-  width: 110px;
-  height: 110px;
+.rocket-stat-window {
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
-  border: 2px solid;
-  background: rgba(4, 6, 20, 0.85);
-  backdrop-filter: blur(12px);
-  overflow: hidden;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: rgba(3, 3, 12, 0.82);
+  backdrop-filter: blur(12px);
+  border: 2px solid var(--stat-color);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--stat-color) 40%, transparent),
+    inset 0 0 12px color-mix(in srgb, var(--stat-color) 10%, transparent);
+  transition: opacity 0.6s ease, transform 0.6s ease;
   flex-shrink: 0;
 }
 
-.porthole-rim {
+.rsw-ring {
   position: absolute;
   inset: 5px;
   border-radius: 50%;
-  border: 1px solid;
-  pointer-events: none;
-}
-
-/* Animated scanlines across each porthole */
-.porthole-scanlines {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--stat-color) 40%, transparent);
+  animation: rsw-spin 8s linear infinite;
   background: repeating-linear-gradient(
     to bottom,
     transparent,
     transparent 3px,
-    rgba(0,0,0,0.15) 3px,
-    rgba(0,0,0,0.15) 4px
+    rgba(0,0,0,0.12) 3px,
+    rgba(0,0,0,0.12) 4px
   );
-  pointer-events: none;
+}
+@keyframes rsw-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
-.porthole-content {
+.rsw-inner {
   position: relative;
   text-align: center;
   z-index: 2;
 }
 
-/* Corner bolts */
-.bolt {
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  opacity: 0.8;
-}
-.bolt-tl { top: -32px; left: -28px; }
-.bolt-tr { top: -32px; right: -28px; }
-.bolt-bl { bottom: -32px; left: -28px; }
-.bolt-br { bottom: -32px; right: -28px; }
-
-.porthole-value {
+.rsw-value {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 2.4rem;
+  font-size: 1.8rem;
   font-weight: 300;
-  letter-spacing: 0.05em;
+  color: var(--stat-color);
+  text-shadow: 0 0 14px var(--stat-color), 0 0 28px color-mix(in srgb, var(--stat-color) 50%, transparent);
   line-height: 1;
-  margin-bottom: 4px;
+  letter-spacing: 0.05em;
 }
 
-.porthole-label {
+.rsw-label {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.5rem;
-  font-weight: 500;
-  letter-spacing: 0.25em;
+  font-size: 0.45rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  border-top: 1px solid;
-  padding-top: 5px;
-  margin-top: 2px;
-  opacity: 0.7;
+  color: color-mix(in srgb, var(--stat-color) 65%, transparent);
+  margin-top: 4px;
+  border-top: 1px solid color-mix(in srgb, var(--stat-color) 30%, transparent);
+  padding-top: 4px;
 }
 
-/* ── HUD Corner decorators ────────────────────────────────────────────────── */
+/* ── HUD Corner decorators ── */
 .hud-corner {
   position: absolute;
   width: 18px;
@@ -370,12 +405,12 @@
 .hud-bl { bottom: 6px; left: 6px; border-width: 0 0 2px 2px; }
 .hud-br { bottom: 6px; right: 6px; border-width: 0 2px 2px 0; }
 
-/* ── Animated scan line sweeping across hud ──────────────────────────────── */
+/* ── Scan line ── */
 .hud-scan-bar {
   position: absolute;
   left: 0; right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(0,240,255,0.15), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0,240,255,0.12), transparent);
   animation: hudScan 4s linear infinite;
   pointer-events: none;
   z-index: 5;
