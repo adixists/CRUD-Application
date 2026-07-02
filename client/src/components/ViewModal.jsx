@@ -11,6 +11,10 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism'; // A good dark sci-fi theme
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 
 const CATEGORY_CONFIG = {
   'AI Model':       { bg:'rgba(0,240,255,0.07)', color:'#00f0ff', border:'rgba(0,240,255,0.2)', dot:'#00f0ff' },
@@ -22,9 +26,11 @@ const CATEGORY_CONFIG = {
 const STATUS_CLASS = { 'Active':'status-active', 'Archived':'status-archived', 'In Review':'status-review' };
 const formatDate = d => new Date(d).toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' });
 
-const ViewModal = ({ isOpen, onClose, resource, onEdit }) => {
+const ViewModal = ({ isOpen, onClose, resource, onEdit, onInlineUpdate }) => {
   const [isMaximized, setIsMaximized] = useState(false);
   const [isEditConfirmOpen, setIsEditConfirmOpen] = useState(false);
+  const [isInlineEditing, setIsInlineEditing] = useState(false);
+  const [inlineContent, setInlineContent] = useState('');
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -40,11 +46,19 @@ const ViewModal = ({ isOpen, onClose, resource, onEdit }) => {
   if (!isOpen || !resource) {
     if (isMaximized) setIsMaximized(false); // reset on close
     if (isEditConfirmOpen) setIsEditConfirmOpen(false);
+    if (isInlineEditing) setIsInlineEditing(false);
     return null;
   }
   
   const cat = CATEGORY_CONFIG[resource.category] || CATEGORY_CONFIG['Other'];
   const stCls = STATUS_CLASS[resource.status] || 'status-active';
+
+  const handleSaveInline = () => {
+    if (onInlineUpdate) {
+      onInlineUpdate(resource._id, { ...resource, description: inlineContent });
+    }
+    setIsInlineEditing(false);
+  };
 
   // Toggle maximize handler
   const handleMaximize = (e) => {
@@ -131,33 +145,54 @@ const ViewModal = ({ isOpen, onClose, resource, onEdit }) => {
                 </div>
 
                 {/* Content Area */}
-                <div 
-                  className="flex-grow overflow-y-auto min-h-0 scrollbar-neon rounded-md mb-6 relative cursor-pointer" 
-                  style={{ background: 'rgba(4,4,8,0.7)', border: '1px solid rgba(26,26,54,0.8)' }}
-                  onClick={() => setIsEditConfirmOpen(true)}
-                  title="Click to edit resource"
-                >
-                  {isCode ? (
-                    <SyntaxHighlighter 
-                      language="javascript"
-                      style={vscDarkPlus}
-                      customStyle={{ margin: 0, padding: '16px', background: 'transparent', fontSize: '0.85rem' }}
-                      wrapLongLines={true}
-                    >
-                      {resource.description || '// No code provided.'}
-                    </SyntaxHighlighter>
-                  ) : (
-                    <div className="p-4 text-sm text-text-primary leading-relaxed font-sans markdown-body">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {resource.description || 'No description provided.'}
-                      </ReactMarkdown>
-                    </div>
-                  )}
-                </div>
+                {isInlineEditing ? (
+                  <div className="flex-grow flex flex-col mb-6 min-h-0 relative">
+                    <textarea
+                      value={inlineContent}
+                      onChange={(e) => setInlineContent(e.target.value)}
+                      className="flex-grow w-full bg-dark-bg text-text-primary p-4 rounded-md outline-none border border-dark-border focus:border-neon-cyan focus:shadow-[0_0_15px_rgba(0,240,255,0.2)] resize-none font-mono text-sm scrollbar-neon"
+                      autoFocus
+                    />
+                  </div>
+                ) : (
+                  <div 
+                    className="flex-grow overflow-y-auto min-h-0 scrollbar-neon rounded-md mb-6 relative cursor-pointer" 
+                    style={{ background: 'rgba(4,4,8,0.7)', border: '1px solid rgba(26,26,54,0.8)' }}
+                    onClick={() => setIsEditConfirmOpen(true)}
+                    title="Click to edit resource text"
+                  >
+                    {isCode ? (
+                      <SyntaxHighlighter 
+                        language="javascript"
+                        style={vscDarkPlus}
+                        customStyle={{ margin: 0, padding: '16px', background: 'transparent', fontSize: '0.85rem' }}
+                        wrapLongLines={true}
+                      >
+                        {resource.description || '// No code provided.'}
+                      </SyntaxHighlighter>
+                    ) : (
+                      <div className="p-4 text-sm text-text-primary leading-relaxed font-sans markdown-body">
+                        <ReactMarkdown 
+                          remarkPlugins={[remarkGfm, remarkBreaks, remarkMath]}
+                          rehypePlugins={[rehypeKatex]}
+                        >
+                          {resource.description || 'No description provided.'}
+                        </ReactMarkdown>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Footer Controls */}
-                <div className="flex justify-end flex-shrink-0 pt-2" style={{ borderTop: '1px solid rgba(26,26,54,0.6)' }}>
-                  <button onClick={onClose} className="btn-neon btn-cyan btn-glitch">CLOSE_TERMINAL</button>
+                <div className="flex justify-end flex-shrink-0 pt-2 gap-3" style={{ borderTop: '1px solid rgba(26,26,54,0.6)' }}>
+                  {isInlineEditing ? (
+                    <>
+                      <button onClick={() => setIsInlineEditing(false)} className="btn-neon btn-red btn-glitch">CANCEL</button>
+                      <button onClick={handleSaveInline} className="btn-neon btn-cyan btn-glitch">SAVE_CHANGES</button>
+                    </>
+                  ) : (
+                    <button onClick={onClose} className="btn-neon btn-cyan btn-glitch">CLOSE_TERMINAL</button>
+                  )}
                 </div>
 
                 {/* Edit Confirmation Overlay */}
@@ -170,10 +205,14 @@ const ViewModal = ({ isOpen, onClose, resource, onEdit }) => {
                     >
                       <div className="p-6 rounded-lg text-center" style={{ background: 'rgba(10,10,20,0.95)', border: `1px solid ${cat.color}60`, boxShadow: `0 0 30px ${cat.color}20` }}>
                         <h3 className="font-mono text-lg text-white mb-3 tracking-wider">EDIT RESOURCE?</h3>
-                        <p className="font-mono text-xs text-text-muted mb-6">Modify the contents of this archive entry.</p>
+                        <p className="font-mono text-xs text-text-muted mb-6">Modify the contents of this archive entry inline.</p>
                         <div className="flex items-center justify-center gap-4">
                           <button onClick={() => setIsEditConfirmOpen(false)} className="btn-neon btn-red btn-glitch">CANCEL</button>
-                          <button onClick={() => { setIsEditConfirmOpen(false); onClose(); onEdit(resource); }} className="btn-neon btn-cyan btn-glitch">
+                          <button onClick={() => { 
+                            setIsEditConfirmOpen(false); 
+                            setInlineContent(resource.description || '');
+                            setIsInlineEditing(true); 
+                          }} className="btn-neon btn-cyan btn-glitch">
                             PROCEED TO EDIT
                           </button>
                         </div>

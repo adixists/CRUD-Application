@@ -93,6 +93,17 @@ const Dashboard = ({ onAddResource }) => {
     try { await updateResource(selectedResource._id, fd); await fetchResources(); addToast(`"${fd.title}" updated.`, 'info'); }
     catch { addToast('Failed to update resource.', 'error'); }
   };
+  const handleInlineUpdate = async (id, fd) => {
+    try {
+      await updateResource(id, fd);
+      await fetchResources();
+      addToast(`"${fd.title}" updated inline.`, 'info');
+      // Update the viewing resource so the modal reflects the change immediately
+      setResourceToView(prev => prev && prev._id === id ? { ...prev, ...fd } : prev);
+    } catch {
+      addToast('Failed to update resource inline.', 'error');
+    }
+  };
   const handleDelete = async () => {
     if (!resourceToDelete) return;
     const title = resourceToDelete.title;
@@ -283,6 +294,7 @@ const Dashboard = ({ onAddResource }) => {
         onClose={() => { setIsViewOpen(false); setResourceToView(null); }}
         resource={resourceToView}
         onEdit={handleEdit}
+        onInlineUpdate={handleInlineUpdate}
       />
 
       {/* ── Toast notifications ──────────────────────────────────────────── */}
