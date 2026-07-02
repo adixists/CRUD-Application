@@ -1,29 +1,57 @@
 /**
  * =============================================================================
- * APP COMPONENT — ARCHIVE TERMINAL v3.0
+ * APP — ARCHIVE TERMINAL v4.0
  * =============================================================================
- * Root application component. Sets up React Router, the fixed Navbar,
- * and main content area with the Dashboard.
+ * Root component. Layers:
+ * 1. Three.js WebGL server room scene (z-index: 0, fixed)
+ * 2. Vignette overlay (z-index: 1, fixed)
+ * 3. Scanlines overlay (z-index: 9990, fixed)
+ * 4. Navbar (z-index: 100, fixed)
+ * 5. Main content (z-index: 10, relative)
+ * 6. Carbon fiber console desk (z-index: 50, fixed bottom)
  */
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import { Suspense, lazy } from 'react';
+import Navbar    from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import './App.css';
+
+// Lazy load the heavy WebGL scene
+const Scene3D = lazy(() => import('./components/Scene3D'));
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen" style={{ background: '#060610' }}>
-        {/* Fixed Navbar — ADD RESOURCE button is managed by Dashboard */}
-        <Navbar />
+      {/* Layer 1: Three.js WebGL Background */}
+      <Suspense fallback={
+        <div className="webgl-canvas" style={{ background: 'linear-gradient(180deg, #040408 0%, #080816 40%, #040408 100%)' }} />
+      }>
+        <Scene3D />
+      </Suspense>
 
-        {/* Main content — extra bottom padding for console desk */}
-        <main className="pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-          </Routes>
-        </main>
+      {/* Layer 2: Vignette */}
+      <div className="vignette" aria-hidden="true" />
+
+      {/* Layer 3: Scanlines */}
+      <div className="scanlines" aria-hidden="true" />
+
+      {/* Layer 4: Fixed Navbar */}
+      <Navbar />
+
+      {/* Layer 5: Main content */}
+      <main
+        className="relative z-10 pt-24 pb-32 px-4 sm:px-6 lg:px-8"
+        style={{ maxWidth: '1300px', margin: '0 auto' }}
+      >
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+        </Routes>
+      </main>
+
+      {/* Layer 6: Carbon fiber console desk */}
+      <div className="console-desk" aria-hidden="true">
+        <img src="/assets/console-desk.png" alt="" className="console-desk-img" draggable="false" />
       </div>
     </Router>
   );

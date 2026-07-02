@@ -1,102 +1,138 @@
 /**
  * =============================================================================
- * RESOURCE MODAL — ARCHIVE TERMINAL v3.1
+ * RESOURCE MODAL — ARCHIVE TERMINAL v4.0
  * =============================================================================
- * Metal-framed Create/Edit form using an AI-generated brushed metal frame
- * image as background, with gradient accent bar and neural network SVG.
+ * Heavy brushed metal sci-fi modal with:
+ * - Framer Motion 3D slide-up + perspective tilt entrance
+ * - Corner screw heads
+ * - Gradient accent bar
+ * - Neural network wireframe watermark
+ * - Custom category dropdown with glassmorphism
+ * - ABORT (magenta) + EXECUTE (cyan) buttons
  */
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const EMPTY_FORM = {
-  title: '',
-  category: 'AI Model',
-  description: '',
-  status: 'Active',
-};
-
+const EMPTY_FORM = { title: '', category: 'AI Model', description: '', status: 'Active' };
 const CATEGORIES = ['AI Model', 'Code Snippet', 'Research Paper', 'Tool', 'Other'];
 const STATUSES   = ['Active', 'Archived', 'In Review'];
 
-/* ── Neural Network SVG ──────────────────────────────────────────────────── */
-const NeuralNetSVG = () => (
-  <svg
-    viewBox="0 0 400 80"
-    className="w-full h-full"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    {/* Connections — layer 1 to layer 2 */}
-    <line x1="60" y1="20" x2="140" y2="15" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
-    <line x1="60" y1="20" x2="140" y2="40" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
-    <line x1="60" y1="20" x2="140" y2="65" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
-    <line x1="60" y1="40" x2="140" y2="15" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
-    <line x1="60" y1="40" x2="140" y2="40" stroke="#00f0ff" strokeWidth="0.5" opacity="0.5" />
-    <line x1="60" y1="40" x2="140" y2="65" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
-    <line x1="60" y1="60" x2="140" y2="15" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
-    <line x1="60" y1="60" x2="140" y2="40" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
-    <line x1="60" y1="60" x2="140" y2="65" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
-
-    {/* Connections — layer 2 to layer 3 */}
-    <line x1="140" y1="15" x2="220" y2="20" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
-    <line x1="140" y1="15" x2="220" y2="45" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
-    <line x1="140" y1="15" x2="220" y2="65" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
-    <line x1="140" y1="40" x2="220" y2="20" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
-    <line x1="140" y1="40" x2="220" y2="45" stroke="#00f0ff" strokeWidth="0.5" opacity="0.5" />
-    <line x1="140" y1="40" x2="220" y2="65" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
-    <line x1="140" y1="65" x2="220" y2="20" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
-    <line x1="140" y1="65" x2="220" y2="45" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
-    <line x1="140" y1="65" x2="220" y2="65" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
-
-    {/* Connections — layer 3 to layer 4 */}
-    <line x1="220" y1="20" x2="300" y2="25" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
-    <line x1="220" y1="20" x2="300" y2="55" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
-    <line x1="220" y1="45" x2="300" y2="25" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
-    <line x1="220" y1="45" x2="300" y2="55" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
-    <line x1="220" y1="65" x2="300" y2="25" stroke="#00f0ff" strokeWidth="0.5" opacity="0.2" />
-    <line x1="220" y1="65" x2="300" y2="55" stroke="#00f0ff" strokeWidth="0.5" opacity="0.3" />
-
-    {/* Connections — layer 4 to output */}
-    <line x1="300" y1="25" x2="360" y2="40" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
-    <line x1="300" y1="55" x2="360" y2="40" stroke="#00f0ff" strokeWidth="0.5" opacity="0.4" />
-
-    {/* Layer 1 nodes */}
-    <circle cx="60" cy="20" r="4" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.7" />
-    <circle cx="60" cy="40" r="4" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.7" />
-    <circle cx="60" cy="60" r="4" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.7" />
-
-    {/* Layer 2 nodes */}
-    <circle cx="140" cy="15" r="4.5" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.8">
-      <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite" />
-    </circle>
-    <circle cx="140" cy="40" r="4.5" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.8">
-      <animate attributeName="opacity" values="0.8;1;0.8" dur="2.5s" repeatCount="indefinite" />
-    </circle>
-    <circle cx="140" cy="65" r="4.5" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.8">
-      <animate attributeName="opacity" values="0.8;1;0.8" dur="1.8s" repeatCount="indefinite" />
-    </circle>
-
-    {/* Layer 3 nodes */}
-    <circle cx="220" cy="20" r="4.5" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.8">
-      <animate attributeName="opacity" values="0.8;1;0.8" dur="2.2s" repeatCount="indefinite" />
-    </circle>
-    <circle cx="220" cy="45" r="5" fill="#060610" stroke="#00f0ff" strokeWidth="1.2" opacity="0.9">
-      <animate attributeName="opacity" values="0.9;1;0.9" dur="1.5s" repeatCount="indefinite" />
-    </circle>
-    <circle cx="220" cy="65" r="4.5" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.8">
-      <animate attributeName="opacity" values="0.8;1;0.8" dur="2.8s" repeatCount="indefinite" />
-    </circle>
-
-    {/* Layer 4 nodes */}
-    <circle cx="300" cy="25" r="4" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.7" />
-    <circle cx="300" cy="55" r="4" fill="#060610" stroke="#00f0ff" strokeWidth="1" opacity="0.7" />
-
-    {/* Output node */}
-    <circle cx="360" cy="40" r="5" fill="rgba(0,240,255,0.15)" stroke="#00f0ff" strokeWidth="1.5" opacity="0.9">
-      <animate attributeName="r" values="5;6;5" dur="2s" repeatCount="indefinite" />
-    </circle>
+/* ── Neural Network Watermark SVG ────────────────────────────────────────── */
+const NeuralWatermark = () => (
+  <svg viewBox="0 0 300 120" className="neural-watermark" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Layer 1 */}
+    {[20,45,70,95].map((y,i) => (
+      [55,110,165,210,260].map((x2,j) => (
+        <line key={`l1-${i}-${j}`} x1="20" y1={y} x2={x2} y2={[25,45,65,85,105][j]} stroke="#00f0ff" strokeWidth="0.4" opacity="0.6" />
+      ))
+    ))}
+    {/* Input nodes */}
+    {[20,45,70,95].map((y,i) => <circle key={`in-${i}`} cx="20" cy={y} r="4" fill="none" stroke="#00f0ff" strokeWidth="0.8" />)}
+    {/* Hidden nodes */}
+    {[25,45,65,85,105].map((y,i) => <circle key={`h1-${i}`} cx="110" cy={y} r="4" fill="none" stroke="#00f0ff" strokeWidth="0.8" />)}
+    {[35,55,75,95].map((y,i) => (
+      [35,55,75,95].map((y2,j) => (
+        <line key={`l2-${i}-${j}`} x1="110" y1={[25,45,65,85,105][i]} x2="200" y2={y2} stroke="#00f0ff" strokeWidth="0.4" opacity="0.5" />
+      ))
+    ))}
+    {[35,55,75,95].map((y,i) => <circle key={`h2-${i}`} cx="200" cy={y} r="4" fill="none" stroke="#00f0ff" strokeWidth="0.8" />)}
+    {/* Output */}
+    {[35,55,75,95].map((y,i) => (
+      <line key={`lout-${i}`} x1="200" y1={y} x2="275" y2="65" stroke="#00f0ff" strokeWidth="0.4" opacity="0.5" />
+    ))}
+    <circle cx="275" cy="65" r="5" fill="rgba(0,240,255,0.1)" stroke="#00f0ff" strokeWidth="1" />
   </svg>
 );
+
+/* ── Custom Dropdown ─────────────────────────────────────────────────────── */
+const Dropdown = ({ name, value, options, onChange, accentColor = '#00f0ff' }) => {
+  const [open, setOpen] = useState(false);
+  
+  const handleSelect = (opt) => {
+    onChange({ target: { name, value: opt } });
+    setOpen(false);
+  };
+
+  return (
+    <div className="relative" style={{ zIndex: open ? 30 : 1 }}>
+      {/* Trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="input-neon flex items-center justify-between cursor-pointer text-left"
+        style={{ borderColor: open ? `${accentColor}60` : 'rgba(26,26,54,0.9)', color: '#d0d0e8' }}
+      >
+        <span>{value}</span>
+        <svg
+          className="w-4 h-4 flex-shrink-0 transition-transform duration-200"
+          style={{ color: accentColor, transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Dropdown list */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scaleY: 0.9 }}
+            animate={{ opacity: 1, y: 0, scaleY: 1 }}
+            exit={{ opacity: 0, y: -6, scaleY: 0.9 }}
+            transition={{ duration: 0.15, ease: 'easeOut' }}
+            style={{ transformOrigin: 'top' }}
+            className="absolute left-0 right-0 top-full mt-1 rounded-lg overflow-hidden"
+            style={{
+              background: 'rgba(6,6,16,0.98)',
+              border: `1px solid ${accentColor}33`,
+              backdropFilter: 'blur(20px)',
+              boxShadow: `0 10px 40px rgba(0,0,0,0.8), 0 0 30px ${accentColor}11`,
+              zIndex: 100,
+            }}
+          >
+            {/* Neural network watermark */}
+            <div className="absolute inset-0 overflow-hidden" style={{ zIndex: 0 }}>
+              <NeuralWatermark />
+            </div>
+
+            {/* Options */}
+            <div className="relative z-10">
+              {options.map((opt) => {
+                const isSelected = opt === value;
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => handleSelect(opt)}
+                    className="w-full text-left px-4 py-3 font-mono text-sm transition-all duration-150 flex items-center gap-2"
+                    style={{
+                      background: isSelected ? `${accentColor}22` : 'transparent',
+                      color: isSelected ? accentColor : '#9090b0',
+                      borderLeft: isSelected ? `3px solid ${accentColor}` : '3px solid transparent',
+                      fontFamily: 'JetBrains Mono, monospace',
+                      fontSize: '0.8rem',
+                    }}
+                    onMouseEnter={e => { if (!isSelected) { e.currentTarget.style.background = `${accentColor}0d`; e.currentTarget.style.color = '#d0d0e8'; } }}
+                    onMouseLeave={e => { if (!isSelected) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#9090b0'; } }}
+                  >
+                    {isSelected && (
+                      <svg className="w-3 h-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                    {!isSelected && <span className="w-3" />}
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 /* ══════════════════════════════════════════════════════════════════════════════ */
 
@@ -105,21 +141,15 @@ const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
   const isEditing = !!resource;
 
   useEffect(() => {
-    if (resource) {
-      setFormData({
-        title:       resource.title       || '',
-        category:    resource.category    || 'AI Model',
-        description: resource.description || '',
-        status:      resource.status      || 'Active',
-      });
-    } else {
-      setFormData(EMPTY_FORM);
-    }
+    setFormData(resource
+      ? { title: resource.title||'', category: resource.category||'AI Model', description: resource.description||'', status: resource.status||'Active' }
+      : EMPTY_FORM
+    );
   }, [resource, isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(p => ({ ...p, [name]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -128,152 +158,174 @@ const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
     onClose();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      className="modal-overlay"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-    >
-      {/* Metal-framed modal panel with AI-generated frame */}
-      <div
-        className="metal-frame w-full max-w-lg mx-4 animate-slide-up"
-        onClick={e => e.stopPropagation()}
-      >
-        {/* AI-generated metal frame background */}
-        <div className="metal-frame-bg">
-          <img src="/assets/metal-frame.png" alt="" draggable="false" />
-        </div>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="metal-modal-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          onClick={onClose}
+        >
+          {/* Metal modal — 3D slide-up + perspective tilt entrance */}
+          <motion.div
+            className="metal-modal"
+            onClick={e => e.stopPropagation()}
+            initial={{
+              opacity: 0,
+              y: 120,
+              rotateX: 25,
+              scale: 0.88,
+              perspective: 1200,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              scale: 1,
+              perspective: 1200,
+            }}
+            exit={{
+              opacity: 0,
+              y: 80,
+              rotateX: 15,
+              scale: 0.92,
+            }}
+            transition={{
+              type: 'spring',
+              damping: 24,
+              stiffness: 300,
+              mass: 0.8,
+            }}
+            style={{ transformOrigin: 'bottom center' }}
+          >
+            {/* Corner screws */}
+            <div className="screw screw-tl" />
+            <div className="screw screw-tr" />
+            <div className="screw screw-bl" />
+            <div className="screw screw-br" />
 
-        {/* Gradient accent bar */}
-        <div className="metal-accent-bar" />
+            {/* Inner panel */}
+            <div className="modal-inner">
+              {/* Gradient accent bar */}
+              <div className="modal-accent-bar" />
 
-        {/* Inner dark content area */}
-        <div className="metal-inner m-4 sm:m-5 p-5">
+              <div className="p-5">
+                {/* Header */}
+                <div className="flex items-start justify-between mb-5">
+                  <div>
+                    <h2 className="font-mono text-[0.95rem] font-bold tracking-wider neon-magenta">
+                      {isEditing ? '// EDIT_RESOURCE' : '// NEW_RESOURCE'}
+                    </h2>
+                    <p className="font-mono text-[0.6rem] text-text-muted mt-1">
+                      {isEditing
+                        ? 'Modify the fields below and execute to save changes.'
+                        : 'Fill in the fields below to add to the archive.'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="w-6 h-6 flex items-center justify-center rounded transition-all"
+                    style={{ color:'#3a3a56', border:'1px solid rgba(26,26,54,0.8)' }}
+                    onMouseEnter={e => { e.currentTarget.style.color='#ff3366'; e.currentTarget.style.borderColor='rgba(255,51,102,0.3)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color='#3a3a56'; e.currentTarget.style.borderColor='rgba(26,26,54,0.8)'; }}
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
 
-          {/* Header */}
-          <div className="flex items-start justify-between mb-5">
-            <div>
-              <h2 id="modal-title" className="font-mono text-base font-bold tracking-wider">
-                <span className="neon-text-magenta">
-                  {isEditing ? '// EDIT_RESOURCE' : '// NEW_RESOURCE'}
-                </span>
-              </h2>
-              <p className="font-mono text-[0.62rem] text-text-muted mt-1">
-                {isEditing
-                  ? 'Modify the fields below and execute to save changes.'
-                  : 'Fill in the fields below to add to the archive.'}
-              </p>
-            </div>
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Title */}
+                  <div>
+                    <label className="block font-mono text-[0.6rem] text-text-muted mb-1.5 tracking-widest uppercase">
+                      <span style={{color:'#ff00cc'}}>▸</span> TITLE
+                    </label>
+                    <input
+                      type="text" name="title" value={formData.title}
+                      onChange={handleChange}
+                      placeholder="e.g. GPT-4 Vision, React hooks..."
+                      className="input-neon input-magenta" required autoFocus
+                    />
+                  </div>
 
-            <button
-              onClick={onClose}
-              className="w-7 h-7 flex items-center justify-center rounded-md transition-all duration-200"
-              style={{ color: '#3e3e5a', border: '1px solid rgba(26,26,56,0.8)' }}
-              onMouseEnter={e => { e.currentTarget.style.color='#ff3366'; e.currentTarget.style.borderColor='rgba(255,51,102,0.3)'; }}
-              onMouseLeave={e => { e.currentTarget.style.color='#3e3e5a'; e.currentTarget.style.borderColor='rgba(26,26,56,0.8)'; }}
-              aria-label="Close modal"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+                  {/* Category + Status */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div style={{ position: 'relative' }}>
+                      <label className="block font-mono text-[0.6rem] text-text-muted mb-1.5 tracking-widest uppercase">
+                        <span style={{color:'#00f0ff'}}>▸</span> CATEGORY
+                      </label>
+                      <Dropdown
+                        name="category"
+                        value={formData.category}
+                        options={CATEGORIES}
+                        onChange={handleChange}
+                        accentColor="#00aaff"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-mono text-[0.6rem] text-text-muted mb-1.5 tracking-widest uppercase">
+                        <span style={{color:'#00f0ff'}}>▸</span> STATUS
+                      </label>
+                      <Dropdown
+                        name="status"
+                        value={formData.status}
+                        options={STATUSES}
+                        onChange={handleChange}
+                        accentColor="#00f0ff"
+                      />
+                    </div>
+                  </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Description */}
+                  <div>
+                    <label className="block font-mono text-[0.6rem] text-text-muted mb-1.5 tracking-widest uppercase">
+                      <span style={{color:'#ffaa00'}}>▸</span> DESCRIPTION
+                    </label>
+                    <textarea
+                      name="description" value={formData.description}
+                      onChange={handleChange}
+                      placeholder="what it does, why it's useful..."
+                      rows={3}
+                      className="input-neon input-magenta resize-none scrollbar-neon"
+                    />
+                  </div>
 
-            {/* Title */}
-            <div>
-              <label className="block font-mono text-[0.65rem] text-text-secondary mb-1.5 tracking-widest uppercase">
-                <span className="text-neon-magenta mr-1">▸</span> TITLE
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="e.g. GPT-4 Vision, React hooks..."
-                className="input-neon input-magenta"
-                required
-                autoFocus
-              />
-            </div>
+                  {/* Neural network watermark strip */}
+                  <div
+                    className="relative overflow-hidden rounded"
+                    style={{ height: '60px', background: 'rgba(0,240,255,0.02)', border: '1px solid rgba(0,240,255,0.06)' }}
+                  >
+                    <NeuralWatermark />
+                  </div>
 
-            {/* Category + Status side by side */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block font-mono text-[0.65rem] text-text-secondary mb-1.5 tracking-widest uppercase">
-                  <span className="text-neon-cyan mr-1">▸</span> CATEGORY
-                </label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="input-neon cursor-pointer"
-                  style={{ borderColor: 'rgba(0, 240, 255, 0.3)' }}
-                >
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+                  {/* Action buttons */}
+                  <div
+                    className="flex items-center justify-end gap-3 pt-3"
+                    style={{ borderTop: '1px solid rgba(26,26,54,0.7)' }}
+                  >
+                    <button type="button" onClick={onClose} className="btn-neon btn-magenta btn-glitch">
+                      ABORT
+                    </button>
+                    <button type="submit" className="btn-neon btn-cyan btn-glitch">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                      </svg>
+                      + EXECUTE
+                    </button>
+                  </div>
+                </form>
               </div>
-              <div>
-                <label className="block font-mono text-[0.65rem] text-text-secondary mb-1.5 tracking-widest uppercase">
-                  <span className="text-neon-cyan mr-1">▸</span> STATUS
-                </label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="input-neon cursor-pointer"
-                  style={{ borderColor: 'rgba(0, 240, 255, 0.3)' }}
-                >
-                  {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
             </div>
-
-            {/* Description */}
-            <div>
-              <label className="block font-mono text-[0.65rem] text-text-secondary mb-1.5 tracking-widest uppercase">
-                <span className="text-neon-amber mr-1">▸</span> DESCRIPTION
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="what it does, why it's useful..."
-                rows={3}
-                className="input-neon input-magenta resize-none scrollbar-neon"
-              />
-            </div>
-
-            {/* Neural network schematic */}
-            <div className="neural-net-container">
-              <NeuralNetSVG />
-            </div>
-
-            {/* Buttons */}
-            <div
-              className="flex items-center justify-end gap-3 pt-3"
-              style={{ borderTop: '1px solid rgba(26,26,56,0.7)' }}
-            >
-              <button type="button" onClick={onClose} className="btn-neon btn-magenta">
-                ABORT
-              </button>
-              <button type="submit" className="btn-neon btn-cyan">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                </svg>
-                EXECUTE
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

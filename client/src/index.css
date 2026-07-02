@@ -1,68 +1,53 @@
 /**
  * =============================================================================
- * GLOBAL STYLES — ARCHIVE TERMINAL v3.0
- * "Sci-Fi Server Room Terminal" Aesthetic
+ * GLOBAL STYLES — ARCHIVE TERMINAL v4.0 WebGL Edition
  * =============================================================================
  */
 
 @import "tailwindcss";
 
 @theme {
-  /* Dark backgrounds — even darker for the server room */
-  --color-dark-bg: #060610;
-  --color-dark-card: #0c0c18;
-  --color-dark-surface: #12122a;
-  --color-dark-border: #1a1a38;
+  --color-dark-bg: #040408;
+  --color-dark-card: #0a0a14;
+  --color-dark-surface: #0f0f1e;
+  --color-dark-border: #1a1a36;
 
-  /* Neon palette — cyan / magenta / green (matching reference) */
   --color-neon-cyan: #00f0ff;
-  --color-neon-cyan-dim: #0099aa;
   --color-neon-magenta: #ff00cc;
-  --color-neon-magenta-dim: #aa0088;
-  --color-neon-purple: #a855f7;
-  --color-neon-purple-deep: #7c3aed;
   --color-neon-green: #00ff88;
   --color-neon-amber: #ffaa00;
+  --color-neon-purple: #a855f7;
   --color-neon-red: #ff3366;
-  --color-neon-orange: #ff6b00;
 
-  /* Text hierarchy */
-  --color-text-primary: #d8d8f0;
-  --color-text-secondary: #7a7a9e;
-  --color-text-muted: #3e3e5a;
+  --color-text-primary: #d0d0e8;
+  --color-text-secondary: #6a6a8e;
+  --color-text-muted: #3a3a56;
 
-  /* Font stacks */
-  --font-family-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-family-mono: 'JetBrains Mono', 'Share Tech Mono', 'Fira Code', monospace;
   --font-family-sans: 'Inter', system-ui, sans-serif;
-  --font-family-display: 'Space Grotesk', 'Inter', sans-serif;
 }
 
-/* Base */
+* { box-sizing: border-box; }
+
 body {
-  background-color: var(--color-dark-bg);
+  background: #040408;
   color: var(--color-text-primary);
   font-family: var(--font-family-sans);
   min-height: 100vh;
   overflow-x: hidden;
+  margin: 0;
 }
 
-#root {
-  min-height: 100vh;
-  position: relative;
-}
-
-html {
-  scroll-behavior: smooth;
-}
+#root { min-height: 100vh; }
 
 ::selection {
-  background-color: rgba(0, 240, 255, 0.2);
-  color: var(--color-neon-cyan);
+  background: rgba(0, 240, 255, 0.2);
+  color: #00f0ff;
 }
 
 /* Neon scrollbar */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: #060610; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #040408; }
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #00f0ff, #ff00cc);
   border-radius: 10px;
