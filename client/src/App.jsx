@@ -12,7 +12,7 @@
  */
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import Navbar    from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import './App.css';
@@ -21,6 +21,19 @@ import './App.css';
 const Scene3D = lazy(() => import('./components/Scene3D'));
 
 function App() {
+  // Global typing sparks effect
+  useEffect(() => {
+    const handleInput = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        e.target.classList.remove('input-typing');
+        void e.target.offsetWidth; // Trigger reflow to restart animation
+        e.target.classList.add('input-typing');
+      }
+    };
+    document.addEventListener('input', handleInput);
+    return () => document.removeEventListener('input', handleInput);
+  }, []);
+
   return (
     <Router>
       {/* Layer 1: Three.js WebGL Background */}

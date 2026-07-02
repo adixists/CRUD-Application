@@ -138,7 +138,13 @@ const Dropdown = ({ name, value, options, onChange, accentColor = '#00f0ff' }) =
 
 const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
   const [formData, setFormData] = useState(EMPTY_FORM);
+  const [isMaximized, setIsMaximized] = useState(false);
   const isEditing = !!resource;
+
+  // Reset max state when closed
+  useEffect(() => {
+    if (!isOpen) setIsMaximized(false);
+  }, [isOpen]);
 
   useEffect(() => {
     setFormData(resource
@@ -168,10 +174,11 @@ const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
           onClick={onClose}
+          style={{ padding: isMaximized ? '0px' : '16px' }}
         >
           {/* Metal modal — 3D slide-up + perspective tilt entrance */}
           <motion.div
-            className="metal-modal"
+            className="metal-modal flex flex-col"
             onClick={e => e.stopPropagation()}
             initial={{
               opacity: 0,
@@ -186,6 +193,11 @@ const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
               rotateX: 0,
               scale: 1,
               perspective: 1200,
+              maxWidth: isMaximized ? '100vw' : '700px',
+              height: isMaximized ? '100vh' : 'auto',
+              maxHeight: isMaximized ? '100vh' : '90vh',
+              margin: isMaximized ? '0' : '16px',
+              borderRadius: isMaximized ? '0' : '10px'
             }}
             exit={{
               opacity: 0,
@@ -202,19 +214,23 @@ const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
             style={{ transformOrigin: 'bottom center' }}
           >
             {/* Corner screws */}
-            <div className="screw screw-tl" />
-            <div className="screw screw-tr" />
-            <div className="screw screw-bl" />
-            <div className="screw screw-br" />
+            {!isMaximized && (
+              <>
+                <div className="screw screw-tl" />
+                <div className="screw screw-tr" />
+                <div className="screw screw-bl" />
+                <div className="screw screw-br" />
+              </>
+            )}
 
             {/* Inner panel */}
-            <div className="modal-inner">
+            <div className={`modal-inner flex flex-col flex-grow ${isMaximized ? '!m-0 !rounded-none !border-0' : ''}`}>
               {/* Gradient accent bar */}
               <div className="modal-accent-bar" />
 
-              <div className="p-5">
+              <div className="p-5 flex flex-col flex-grow overflow-hidden">
                 {/* Header */}
-                <div className="flex items-start justify-between mb-5">
+                <div className="flex items-start justify-between mb-5 flex-shrink-0">
                   <div>
                     <h2 className="font-mono text-[0.95rem] font-bold tracking-wider neon-magenta">
                       {isEditing ? '// EDIT_RESOURCE' : '// NEW_RESOURCE'}
@@ -225,9 +241,25 @@ const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
                         : 'Fill in the fields below to add to the archive.'}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={onClose}
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsMaximized(!isMaximized)}
+                      className="w-6 h-6 flex items-center justify-center rounded transition-all"
+                      style={{ color:'#3a3a56', border:'1px solid rgba(26,26,54,0.8)' }}
+                      onMouseEnter={e => { e.currentTarget.style.color='#00f0ff'; e.currentTarget.style.borderColor='rgba(0,240,255,0.3)'; }}
+                      onMouseLeave={e => { e.currentTarget.style.color='#3a3a56'; e.currentTarget.style.borderColor='rgba(26,26,54,0.8)'; }}
+                      aria-label="Maximize"
+                    >
+                      {isMaximized ? (
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                      ) : (
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onClose}
                     className="w-6 h-6 flex items-center justify-center rounded transition-all"
                     style={{ color:'#3a3a56', border:'1px solid rgba(26,26,54,0.8)' }}
                     onMouseEnter={e => { e.currentTarget.style.color='#ff3366'; e.currentTarget.style.borderColor='rgba(255,51,102,0.3)'; }}
@@ -240,7 +272,7 @@ const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
                 </div>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="flex flex-col flex-grow space-y-4 overflow-y-auto overflow-x-hidden pr-2 scrollbar-neon">
                   {/* Title */}
                   <div>
                     <label className="block font-mono text-[0.6rem] text-text-muted mb-1.5 tracking-widest uppercase">
@@ -283,8 +315,8 @@ const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
                   </div>
 
                   {/* Description */}
-                  <div>
-                    <label className="block font-mono text-[0.6rem] text-text-muted mb-1.5 tracking-widest uppercase">
+                  <div className="flex flex-col flex-grow">
+                    <label className="block font-mono text-[0.6rem] text-text-muted mb-1.5 tracking-widest uppercase flex-shrink-0">
                       <span style={{color:'#ffaa00'}}>▸</span> DESCRIPTION
                     </label>
                     <textarea
@@ -292,7 +324,7 @@ const ResourceModal = ({ isOpen, onClose, onSubmit, resource }) => {
                       onChange={handleChange}
                       placeholder="what it does, why it's useful..."
                       rows={3}
-                      className="input-neon input-magenta resize-none scrollbar-neon"
+                      className="input-neon input-magenta resize-none scrollbar-neon flex-grow min-h-[100px]"
                     />
                   </div>
 
