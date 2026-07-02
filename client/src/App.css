@@ -250,7 +250,7 @@
     0 0 60px rgba(0,240,255,0.06),
     0 0 120px rgba(100,0,200,0.04),
     inset 0 1px 0 rgba(255,255,255,0.03);
-  height: 200px;
+  height: 260px;
 }
 
 /* The Three.js canvas fills the full background */
